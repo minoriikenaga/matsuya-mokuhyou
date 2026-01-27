@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>目標管理シート - 編集可能版</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', 'Yu Gothic', 'Meiryo', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            font-size: 2em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .period {
+            text-align: center;
+            color: white;
+            font-size: 1.2em;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        
+        .edit-mode-toggle {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .toggle-btn {
+            padding: 12px 30px;
+            background: white;
+            color: #667eea;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            transition: all 0.3s;
+        }
+        
+        .toggle-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0,0,0,0.3);
+        }
+        
+        .toggle-btn.active {
+            background: #28a745;
+            color: white;
+        }
+        
+        .tab-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .tab {
+            padding: 12px 24px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            transition: all 0.3s;
+            backdrop-filter: blur(10px);
+        }
+        
+        .tab:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+        
+        .tab.active {
+            background: white;
+            color: #667eea;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        }
+        
+        .person-card {
+            display: none;
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            animation: fadeIn 0.5s;
+        }
+        
+        .person-card.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .person-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #667eea;
+        }
+        
+        .person-name {
+            font-size: 2em;
+            color: #667eea;
+            font-weight: bold;
+            margin-right: 15px;
+        }
+        
+        .role-badge {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+        
+        .section {
+            margin-bottom: 30px;
+        }
+        
+        .section-title {
+            font-size: 1.3em;
+            color: #333;
+            margin-bottom: 15px;
+            padding-left: 15px;
+            border-left: 5px solid #667eea;
+            font-weight: bold;
+        }
+        
+        .goal-item {
+            background: #f8f9fa;
+            padding: 15px;
+            margin-bottom: 12px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            transition: all 0.3s;
+            position: relative;
+        }
+        
+        .goal-item:hover {
+            background: #e9ecef;
+        }
+        
+        .goal-item.new {
+            border-left-color: #28a745;
+            background: #d4edda;
+        }
+        
+        .goal-item.new::before {
+            content: "追加";
+            background: #28a745;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.75em;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+        
+        .goal-text {
+            color: #333;
+            font-size: 1em;
+        }
+        
+        .store-goals {
+            background: #fff3cd;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 5px solid #ffc107;
+            margin-bottom: 30px;
+        }
+        
+        .store-goals-title {
+            font-size: 1.2em;
+            color: #856404;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+        
+        .store-goal-item {
+            padding: 10px;
+            margin-bottom: 10px;
+            background: white;
+            border-radius: 5px;
+            color: #333;
+            position: relative;
+        }
+        
+        .skill-progress {
+            background: #e7f3ff;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 5px solid #0066cc;
+        }
+        
+        .skill-title {
+            font-size: 1.1em;
+            color: #0066cc;
+            margin-bottom: 12px;
+            font-weight: bold;
+        }
+        
+        .skill-item {
+            background: white;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            color: #333;
+            position: relative;
+        }
+        
+        .highlight {
+            background: #fff9db;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+        
+        /* 編集モード用スタイル */
+        .editable {
+            cursor: text;
+            padding: 5px;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+        
+        .editable:hover {
+            background: rgba(102, 126, 234, 0.1);
+        }
+        
+        .editable[contenteditable="true"] {
+            background: #fffacd;
+            border: 2px solid #667eea;
+            outline: none;
+        }
+        
+        .delete-btn {
+            position: absolute;
+            right: 10px;
+            top: 10px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.8em;
+            display: none;
+        }
+        
+        .edit-mode .delete-btn {
+            display: block;
+        }
+        
+        .delete-btn:hover {
+            background: #c82333;
+        }
+        
+        .add-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            margin-top: 10px;
+            display: none;
+        }
+        
+        .edit-mode .add-btn {
+            display: inline-block;
+        }
+        
+        .add-btn:hover {
+            background: #218838;
+        }
+        
+        .save-export-container {
+            text-align: center;
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .edit-mode .save-export-container {
+            display: block;
+        }
+        
+        .save-btn, .export-btn {
+            padding: 12px 30px;
+            margin: 0 10px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .save-btn {
+            background: #28a745;
+            color: white;
+        }
+        
+        .save-btn:hover {
+            background: #218838;
+        }
+        
+        .export-btn {
+            background: #007bff;
+            color: white;
+        }
+        
+        .export-btn:hover {
+            background: #0056b3;
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            h1 {
+                font-size: 1.5em;
+            }
+            
+            .person-card {
+                padding: 20px;
+            }
+            
+            .tab {
+                padding: 10px 16px;
+                font-size: 0.9em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 目標管理シート</h1>
+        <div class="period editable" contenteditable="false">1/26(月) ~ 2/1(日)</div>
+        
+        <div class="edit-mode-toggle">
+            <button class="toggle-btn" onclick="toggleEditMode()">✏️ 編集モードON</button>
+        </div>
+        
+        <div class="tab-container" id="tabContainer">
+            <button class="tab active" onclick="showPerson('kawamura')">川村</button>
+            <button class="tab" onclick="showPerson('ikenaga')">池永</button>
+            <button class="tab" onclick="showPerson('kakogawa')">加古川</button>
+            <button class="tab" onclick="showPerson('matsuda')">松田</button>
+        </div>
+
+        <!-- 川村 -->
+        <div id="kawamura" class="person-card active">
+            <div class="person-header">
+                <div class="person-name editable" contenteditable="false">川村</div>
+                <div class="role-badge editable" contenteditable="false">店長・育成責任者</div>
+            </div>
+            
+            <div class="store-goals">
+                <div class="store-goals-title">🎯 店舗目標での役割</div>
+                <div class="store-goal-item editable" contenteditable="false">
+                    <button class="delete-btn" onclick="deleteItem(this)">削除</button>
+                    ■ 人時7700円達成のためのシフト配置見直し(責任者)
+                </div>
+                <div class="store-goal-item editable" contenteditable="false">
+                    <button class="delete-btn" onclick="deleteItem(this)">削除</button>
+                    ■ クレンリネス2点改善の実施管理(保温ジャー・棚清掃)
+                </div>
+                <div class="store-goal-item editable" contenteditable="false">
+                    <button class="delete-btn" onclick="deleteItem(this)">削除</button>
+                    ■ サンクスコイン150以上・退勤時FB実施の管理
+                </div>
+                <div class="store-goal-item editable" contenteditable="false">
+                    <button class="delete-btn" onclick="deleteItem(this)">削除</button>
+                    ■ 発注チェックリスト作成と運用
+                </div>
+                <div class="store-goal-item editable" contenteditable="false">
+                    <button class="delete-btn" onclick="deleteItem(this)">削除</button>
+                    ■ 見本となる挨拶・出勤ルーティンの実践
+                </div>
+                <button class="add-btn" onclick="addStoreGoal(this)">+ 店舗目標を追加</button>
+            </div>
+            
+            <div class="section">
+                <div class="section-title">📋 今週の行動目標</div>
+                <div class="goal-item">
+                    <button class="delete-btn" onclick="deleteItem(this)">削除</button>
+                    <div class="goal-text editable" contenteditable="false">・加古川さん、コンロ場チェックリスト項目「盛付手順」「温度管理」のカラトレを<span class="highlight">各3回実施</span>し、ポイント発声ができたら〇判定(火)</div>
+                </div>
+                <div class="goal-item">
+                    <button class="delete-btn" onclick="deleteItem(this)">削除</button>
+                    <div class="goal-text editable" contenteditable="false">・松田さんのスキルマップ全6ポジションの現状評価を<span class="highlight">1/28(水)までに</span>本人と確認し記入完了</div>
+                </div>
+                <div class="goal-item">
+                    <button class="delete-btn" onclick="deleteItem(this)">削除</button>
+                    <div class="goal-text editable" contenteditable="false">・池永・加古川・松田の3名に<span class="highlight">各15分以上</span>の面談を実施し、サンクスコイン進捗と退勤時FB実施状況を確認(全日)</div>
+                </div>
+                <div class="goal-item new">
+                    <button class="delete-btn" onclick="deleteItem(this)">削除</button>
+                    <div class="goal-text editable" contenteditable="false">・人時7700円達成のため、1/27~29の3日間のシフト配置を見直し、ピーク時間帯の人員を<span class="highlight">1名削減</span></div>
+                </div>
+                <div class="goal-item new">
+                    <button class="delete-btn" onclick="deleteItem(this)">削除</button>
+                    <div class="goal-text editable" contenteditable="false">・保温ジャー内部清掃を<span class="highlight">1/28(水)</span>に池永と実施し、チェックリスト写真撮影</div>
+                </div>
+                <div class="goal-item new">
+                    <button class="delete-btn" onclick="deleteItem(this)">削除</button>
+                    <div class="goal-text editable" contenteditable="false">・退勤時FBを毎日全スタッフに<span class="highlight">1人30秒以上実施</span>(全日)</div>
+                </div>
+                <button class="add-btn" onclick="addWeeklyGoal(this)">+ 週次目標を追加</button>
+            </div>
+            
+            <div class="skill-progress">
+                <div class="skill-title">🎓 スキルマップ育成目標</div>
+                <div class="skill-item editable" contenteditable="false">
+                    <button class="delete-btn" onclick="deleteItem(this)">削除</button>
+                    <strong>■ 池永さん 案内・ファースト 〇判定</strong><br>
+                    チェックリスト項目「席案内の声量」「注文復唱」「配膳タイミング」を各3回カラトレ実施し、全項目でポイント発声ができたら〇判定。<span class="highlight">1/31(金)までに判定完了</span>
+                </div>
+                <div class="skill-item editable" contenteditable="false">
+                    <button class="delete-btn" onclick="deleteItem(this)">削除</button>
+                    <strong>■ 加古川さん コンロ場 〇判定</strong><br>
+                    チェックリスト項目「盛付手順」「温度管理」「調理スピード」を各3回カラトレ実施させ、全項目でポイント発声ができたら〇判定。<span class="highlight">1/31(金)までに判定完了</span>
+                </div>
+                <div class="skill-item editable" contenteditable="false">
+                    <button class="delete-btn" onclick="deleteItem(this)">削除</button>
+                    <strong>■ 松田さん スキルマップ作成</strong><br>
+                    1/28(水)までに松田さんと全6ポジションの現状評価を確認し記入完了。△評価ポジションの改善計画を一緒に作成し、週次目標に反映
+                </div>
+                <button class="add-btn" onclick="addSkillGoal(this)">+ スキル目標を追加</button>
+            </div>
+        </div>
+
+        <!-- 池永 -->
+        <div id="ikenaga" class="person-card">
+            <div class="person-header">
+                <div class="person-name editable" contenteditable="false">池永</div>
+                <div class="role-badge editable" contenteditable="false">SS・クレンリネス担当</div>
+            </div>
+            
+            <div class="store-goals">
+                <div class="store-goals-title">🎯 店舗目標での役割</div>
+                <div class="store-goal-item editable" contenteditable="false">
+                    <button class="delete-btn" onclick="deleteItem(this)">削除</button>
+                    ■ 見本となる挨拶・出勤ルーティンの実践(社員・SS)
+                </div>
+                <div class="store-goal-item editable" contenteditable="false">
+                    <button class="delete-btn" onclick="deleteItem(this)">削除</button>
+                    ■ クレンリネス2点改善への協力(保温ジャー清掃実施)
+                </div>
+                <button class="add-btn" onclick="addStoreGoal(this)">+ 店舗目標を追加</button>
+            </div>
+            
+            <div class="section">
+                <div class="section-title">📋 今週の行動目標</div>
+                <div class="goal-item">
+                    <button class="delete-btn" onclick="deleteItem(this)">削除</button>
+                    <div class="goal-text editable" contenteditable="false">・ラストチェックリスト全12項目のうち「トイレ清掃」「ゴミ分別」を加古川・松田に<span class="highlight">各2回実施</span>させ、不備があれば即座に再指導(月水木)</div>
+                </div>
+                <div class="goal-item new">
+                    <button class="delete-btn" onclick="deleteItem(this)">削除</button>
+                    <div class="goal-text editable" contenteditable="false">・案内・ファーストのチェックリスト項目「席案内の声量」「注文復唱」を川村に<span class="highlight">3回カラトレ</span>で確認してもらい〇判定取得(月水金)</div>
+                </div>
+                <div class="goal-item new">
+                    <button class="delete-btn" onclick="deleteItem(this)">削除</button>
+                    <div class="goal-text editable" contenteditable="false">・出勤時に「いらっしゃいませ!」を<span class="highlight">5m先まで届く声量</span>で毎日実施し、川村のFBを受ける(全日)</div>
+                </div>
+                <button class="add-btn" onclick="addWeeklyGoal(this)">+ 週次目標を追加</button>
+            </div>
+            
+            <div class="skill-progress">
+                <div class="skill-title">🎓 スキルマップ進捗目標</div>
+                <div class="skill-item editable" contenteditable="false">
+                    <button class="delete-btn" onclick="deleteItem(this)">削除</button>
+                    <strong>■ 案内・ファースト 〇判定取得</strong><br>
+                    チェックリスト項目「席案内の声量」「注文復唱」「配膳タイミング」を川村に各3回カラトレで確認してもらい、全項目でポイント発声ができたら〇判定。<span class="highlight">1/31(金)までに川村から判定取得</span>
+                </div>
+                <div class="skill-item editable" contenteditable="false">
+                    <button class="delete-btn" onclick="deleteItem(this)">削除</button>
+                    <strong>■ 肉場 〇判定取得</strong><br>
+                    肉場の現状評価(×/△)を1/27(月)に川村と確認。チェックリスト項目「肉の切り分け」「焼き加減判断」を各3回カラトレ実施し、川村から〇判定を<span class="highlight">2/15までに取得</span>
+                </div>
+                <button class="add-btn" onclick="addSkillGoal(this)">+ スキル目標を追加</button>
+            </div>
+        </div>
+
+        <!-- 加古川 -->
+        <div id="kakogawa" class="person-card">
+            <div class="person-header">
+                <div class="person-name editable" contenteditable="false">加古川</div>
+                <div class="role-badge editable" contenteditable="false">スタッフ・コンロ場育成中</div>
+            </div>
+            
+            <div class="store-goals">
+                <div class="store-goals-title">🎯 店舗目標での役割</div>
+                <div class="store-goal-item editable" contenteditable="false">
+                    <button class="delete-btn" onclick="deleteItem(this)">削除</button>
+                    ■ クレンリネス2点改善の実施(テーブル横セット棚・保温ジャー清掃)
+                </div>
+                <button class="add-btn" onclick="addStoreGoal(this)">+ 店舗目標を追加</button>
+            </div>
+            
+            <div class="section">
+                <div class="section-title">📋 今週の行動目標</div>
+                <div class="goal-item">
+                    <button class="delete-btn" onclick="deleteItem(this)">削除</button>
+                    <div class="goal-text editable" contenteditable="false">・コンロ場チェックリスト「盛付手順」を<span class="highlight">毎日2回以上カラトレ実施</span>し、川村の〇判定を<span class="highlight">1/31(金)までに取得</span>(全日)</div>
+                </div>
+                <div class="goal-item">
+                    <button class="delete-btn" onclick="deleteItem(this)">削除</button>
+                    <div class="goal-text editable" contenteditable="false">・横の棚清掃を火水木の3日間実施し、<span class="highlight">チェックリスト写真を撮影</span>して川村に提出。保温ジャー内部清掃を1/28(水)に川村と実施(火水木)</div>
+                </div>
+                <div class="goal-item new">
+                    <button class="delete-btn" onclick="deleteItem(this)">削除</button>
+                    <div class="goal-text editable" contenteditable="false">・退勤時に池永または川村から<span class="highlight">30秒以上のFB</span>を毎日受ける(全日)</div>
+                </div>
+                <button class="add-btn" onclick="addWeeklyGoal(this)">+ 週次目標を追加</button>
+            </div>
+            
+            <div class="skill-progress">
+                <div class="skill-title">🎓 スキルマップ進捗目標</div>
+                <div class="skill-item editable" contenteditable="false">
+                    <button class="delete-btn" onclick="deleteItem(this)">削除</button>
+                    <strong>■ コンロ場 〇判定取得</strong><br>
+                    チェックリスト項目「盛付手順」「温度管理」「調理スピード」を毎日2回以上カラトレ実施し、川村に各3回確認してもらい全項目でポイント発声ができたら〇判定。<span class="highlight">1/31(金)までに判定取得</span>
+                </div>
+                <button class="add-btn" onclick="addSkillGoal(this)">+ スキル目標を追加</button>
+            </div>
+        </div>
+
+        <!-- 松田 -->
+        <div id="matsuda" class="person-card">
+            <div class="person-header">
+                <div class="person-name editable" contenteditable="false">松田</div>
+                <div class="role-badge editable" contenteditable="false">SS・新人育成中</div>
+            </div>
+            
+            <div class="store-goals">
+                <div class="store-goals-title">🎯 店舗目標での役割</div>
+                <div class="store-goal-item editable" contenteditable="false">
+                    <button class="delete-btn" onclick="deleteItem(this)">削除</button>
+                    ■ 見本となる挨拶・出勤ルーティンの実践(社員・SS)
+                </div>
+                <div class="store-goal-item editable" contenteditable="false">
+                    <button class="delete-btn" onclick="deleteItem(this)">削除</button>
+                    ■ サンクスコイン150以上の達成
+                </div>
+                <button class="add-btn" onclick="addStoreGoal(this)">+ 店舗目標を追加</button>
+            </div>
+            
+            <div class="section">
+                <div class="section-title">📋 今週の行動目標</div>
+                <div class="goal-item">
+                    <button class="delete-btn" onclick="deleteItem(this)">削除</button>
+                    <div class="goal-text editable" contenteditable="false">・出勤時「おはようございます!」+特急挨拶を<span class="highlight">5m先まで届く声量</span>で毎日実施し、川村または池永のFBを受ける(全日)</div>
+                </div>
+                <div class="goal-item">
+                    <button class="delete-btn" onclick="deleteItem(this)">削除</button>
+                    <div class="goal-text editable" contenteditable="false">・スキルマップの現状評価を<span class="highlight">1/28(水)までに</span>川村と確認し記入完了。△評価ポジションのうち1つを選び、チェックリスト項目を<span class="highlight">毎日2回以上カラトレ実施</span>(全日)</div>
+                </div>
+                <div class="goal-item new">
+                    <button class="delete-btn" onclick="deleteItem(this)">削除</button>
+                    <div class="goal-text editable" contenteditable="false">・サンクスコインを<span class="highlight">週3枚以上送信</span>し、1/31(金)時点での累計枚数を川村に報告</div>
+                </div>
+                <button class="add-btn" onclick="addWeeklyGoal(this)">+ 週次目標を追加</button>
+            </div>
+            
+            <div class="skill-progress">
+                <div class="skill-title">🎓 スキルマップ進捗目標</div>
+                <div class="skill-item editable" contenteditable="false">
+                    <button class="delete-btn" onclick="deleteItem(this)">削除</button>
+                    <strong>■ スキルマップ作成完了</strong><br>
+                    1/28(水)までに川村と全6ポジションの現状評価を確認し記入完了。△評価ポジションのうち1つを選び、チェックリスト項目を特定して週次目標に反映。<span class="highlight">2/7(金)までに1ポジションを△→〇に昇格</span>
+                </div>
+                <button class="add-btn" onclick="addSkillGoal(this)">+ スキル目標を追加</button>
+            </div>
+        </div>
+        
+        <div class="save-export-container">
+            <button class="save-btn" onclick="saveData()">💾 保存</button>
+            <button class="export-btn" onclick="exportHTML()">📥 HTMLエクスポート</button>
+        </div>
+    </div>
+
+    <script>
+        let editMode = false;
+
+        function toggleEditMode() {
+            editMode = !editMode;
+            const btn = document.querySelector('.toggle-btn');
+            const editables = document.querySelectorAll('.editable');
+            const body = document.body;
+            
+            if (editMode) {
+                btn.textContent = '👁️ 閲覧モードに戻る';
+                btn.classList.add('active');
+                body.classList.add('edit-mode');
+                editables.forEach(el => el.contentEditable = 'true');
+            } else {
+                btn.textContent = '✏️ 編集モードON';
+                btn.classList.remove('active');
+                body.classList.remove('edit-mode');
+                editables.forEach(el => el.contentEditable = 'false');
+            }
+        }
+
+        function showPerson(personId) {
+            document.querySelectorAll('.person-card').forEach(card => {
+                card.classList.remove('active');
+            });
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            document.getElementById(personId).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function deleteItem(btn) {
+            if (confirm('この項目を削除しますか?')) {
+                btn.parentElement.remove();
+            }
+        }
+
+        function addStoreGoal(btn) {
+            const container = btn.parentElement;
+            const newItem = document.createElement('div');
+            newItem.className = 'store-goal-item editable';
+            newItem.contentEditable = 'true';
+            newItem.innerHTML = '<button class="delete-btn" onclick="deleteItem(this)">削除</button>■ 新しい店舗目標を入力してください';
+            container.insertBefore(newItem, btn);
+            newItem.focus();
+        }
+
+        function addWeeklyGoal(btn) {
+            const container = btn.parentElement;
+            const newItem = document.createElement('div');
+            newItem.className = 'goal-item new';
+            newItem.innerHTML = '<button class="delete-btn" onclick="deleteItem(this)">削除</button><div class="goal-text editable" contenteditable="true">・新しい週次目標を入力してください</div>';
+            container.insertBefore(newItem, btn);
+            newItem.querySelector('.goal-text').focus();
+        }
+
+        function addSkillGoal(btn) {
+            const container = btn.parentElement;
+            const newItem = document.createElement('div');
+            newItem.className = 'skill-item editable';
+            newItem.contentEditable = 'true';
+            newItem.innerHTML = '<button class="delete-btn" onclick="deleteItem(this)">削除</button><strong>■ 新しいスキル目標</strong><br>詳細を入力してください';
+            container.insertBefore(newItem, btn);
+            newItem.focus();
+        }
+
+        function saveData() {
+            localStorage.setItem('goalData', document.querySelector('.container').innerHTML);
+            alert('✅ データを保存しました!');
+        }
+
+        function loadData() {
+            const saved = localStorage.getItem('goalData');
+            if (saved) {
+                document.querySelector('.container').innerHTML = saved;
+                setupEventListeners();
+            }
+        }
+
+        function setupEventListeners() {
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.onclick = function() { showPerson(this.getAttribute('onclick').match(/'(.*)'/)[1]); };
+            });
+        }
+
+        function exportHTML() {
+            const content = document.documentElement.outerHTML;
+            const blob = new Blob([content], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = '目標管理シート_' + new Date().toISOString().split('T')[0] + '.html';
+            a.click();
+            URL.revokeObjectURL(url);
+            alert('📥 HTMLファイルをダウンロードしました!');
+        }
+
+        window.onload = function() {
+            const saved = localStorage.getItem('goalData');
+            if (saved && confirm('前回の編集データを復元しますか?')) {
+                loadData();
+            }
+        };
+    </script>
+</body>
+</html>
