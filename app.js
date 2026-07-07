@@ -53,17 +53,39 @@
     };
   }
 
+  // ---- 全カテゴリのデータを集約 ----
+  // 各カテゴリのデータファイルは window.SUBSETS_CATxx / QUESTIONS_CATxx / REFERENCES_CATxx を定義する。
+  // cat_01 → "CAT01" のようにIDから接尾辞を決めて、読み込まれている全カテゴリ分を集約する。
+  function categorySuffix(catId) {
+    return catId.replace("cat_", "CAT"); // cat_01 -> CAT01
+  }
+  function collect(kind) {
+    const out = [];
+    (window.CATEGORIES || []).forEach((cat) => {
+      const arr = window[kind + "_" + categorySuffix(cat.id)];
+      if (Array.isArray(arr)) out.push.apply(out, arr);
+    });
+    return out;
+  }
+  function allSubsets() {
+    return collect("SUBSETS");
+  }
   function findReference(refId) {
-    return (window.REFERENCES_CAT01 || []).find((r) => r.id === refId) || null;
+    return collect("REFERENCES").find((r) => r.id === refId) || null;
   }
   function findQuestion(qId) {
-    return (window.QUESTIONS_CAT01 || []).find((q) => q.id === qId) || null;
+    return collect("QUESTIONS").find((q) => q.id === qId) || null;
   }
   function findSubset(subsetId) {
-    return (window.SUBSETS_CAT01 || []).find((s) => s.id === subsetId) || null;
+    return allSubsets().find((s) => s.id === subsetId) || null;
   }
   function subsetsInOrder() {
-    return window.SUBSETS_CAT01 || [];
+    return allSubsets();
+  }
+  // データが実際に読み込まれているカテゴリのみ「利用可能」とみなす
+  function categoryIsAvailable(cat) {
+    const arr = window["SUBSETS_" + categorySuffix(cat.id)];
+    return Array.isArray(arr) && arr.length > 0;
   }
 
   // ---- 画面状態 ----
@@ -112,14 +134,12 @@
 
   // ---- TOP画面(大枠選択) ----
   function renderTop() {
+    const availableCount = window.CATEGORIES.filter(categoryIsAvailable).length;
     const cards = window.CATEGORIES.map((cat) => {
-      const disabled = cat.status !== "available";
-      const catQuestionIds =
-        cat.id === "cat_01" ? (window.QUESTIONS_CAT01 || []).map((q) => q.id) : [];
-      const answeredSubsets = catQuestionIds.length
-        ? subsetsInOrder().filter((s) => s.categoryId === cat.id && getSubsetProgress(s.id).perfectCount > 0).length
-        : 0;
-      const totalSubsets = subsetsInOrder().filter((s) => s.categoryId === cat.id).length;
+      const disabled = !categoryIsAvailable(cat);
+      const catSubsets = subsetsInOrder().filter((s) => s.categoryId === cat.id);
+      const answeredSubsets = catSubsets.filter((s) => getSubsetProgress(s.id).perfectCount > 0).length;
+      const totalSubsets = catSubsets.length;
       const pct = totalSubsets ? Math.round((answeredSubsets / totalSubsets) * 100) : 0;
       return (
         '<div class="category-card ' + (disabled ? "disabled" : "") + '" ' +
@@ -134,7 +154,7 @@
     }).join("");
 
     render(
-      '<div class="app-header"><h1>ドラマー知識検定(仮称)</h1><p>パイロット版 — 基礎知識編のみ利用可能</p></div>' +
+      '<div class="app-header"><h1>ドラマー知識検定(仮称)</h1><p>パイロット版 — ' + availableCount + " / " + window.CATEGORIES.length + "カテゴリ 公開中</p></div>" +
       '<div class="screen"><div class="category-grid">' + cards + "</div></div>" +
       bannerAdHtml()
     );
@@ -332,7 +352,7 @@
 
   function openCategory(categoryId) {
     const cat = window.CATEGORIES.find((c) => c.id === categoryId);
-    if (cat.status !== "available") return;
+    if (!categoryIsAvailable(cat)) return;
     renderCategory(categoryId);
   }
 
