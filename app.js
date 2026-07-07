@@ -287,7 +287,8 @@
     progress[state.subsetId] = { bestScoreRaw, bestScoreDisplay, perfectCount, tier };
     saveProgress(progress);
 
-    showInterstitial(() => renderResult(state, score, isPerfect, perfectCount, tier));
+    // 結果はインタースティシャルで待たせず即表示し、広告は点数の下にインラインで同時表示する
+    renderResult(state, score, isPerfect, perfectCount, tier);
   }
 
   function renderResult(state, score, isPerfect, perfectCount, tier) {
@@ -302,6 +303,7 @@
       (isPerfect
         ? '<div class="result-badge">🎉 満点達成!(累計 ' + perfectCount + "回) " + (tier ? "バッジ: " + tier : "") + "</div>"
         : '<div class="result-badge">満点まであと少し。もう一回挑戦してみましょう。</div>') +
+      '<div class="result-ad-placeholder">広告(プレースホルダー) — 結果画面インライン広告</div>' +
       '<div class="result-buttons">' +
       '<button class="btn-top" onclick="DrumQuiz.goTop()">トップへ戻る</button>' +
       '<button class="btn-retry" onclick="DrumQuiz.retrySubset(\'' + state.subsetId + '\')">もう一回</button>' +

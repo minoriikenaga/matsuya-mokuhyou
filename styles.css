@@ -313,6 +313,16 @@ body {
   font-size: 1.1em;
 }
 
+.result-ad-placeholder {
+  margin-top: 20px;
+  padding: 22px 16px;
+  background: #f3f4f6;
+  border: 2px dashed #d1d5db;
+  border-radius: 8px;
+  color: #9ca3af;
+  font-size: 0.85em;
+}
+
 .result-buttons {
   margin-top: 24px;
   display: flex;
