@@ -220,6 +220,9 @@
     const state = currentQuizState;
     const q = state.questions[state.index];
     const shuffle = state.shuffles[state.index];
+    const curSubset = findSubset(state.subsetId);
+    const curCat = curSubset ? window.CATEGORIES.find((c) => c.id === curSubset.categoryId) : null;
+    const catTitle = curCat ? curCat.title : "";
 
     const mediaHtml = q.media
       ? '<div class="media-placeholder">🖼 画像素材未実装(プレースホルダー): ' + (q.media.altText || q.media.kind) + "</div>"
@@ -236,7 +239,7 @@
       '<div class="screen">' +
       '<div class="question-card">' +
       '<div class="question-progress">問題 ' + (state.index + 1) + " / " + state.questions.length + "</div>" +
-      '<div class="question-tag">基礎知識編 / ' + q.difficulty + "</div>" +
+      '<div class="question-tag">' + catTitle + " / " + q.difficulty + "</div>" +
       '<div class="question-text">' + q.text + "</div>" +
       mediaHtml +
       '<div class="choice-list" id="choice-list">' + choiceButtons + "</div>" +
