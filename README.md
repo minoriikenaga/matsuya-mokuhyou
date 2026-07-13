@@ -15,19 +15,37 @@
 
 1. 基礎知識編 / 2. 楽器本体編 / 3. 楽器パーツ編 / 4. ハードウェア編 / 5. セッティング編 / 6. メンテナンス編 / 7. 音作り編 / 8. 演奏技術編 / 9. 演奏表現・アレンジ編 / 10. コンビネーション編 / 11. トラブルシューティング編 / 12. 現場判断編 / 13. ドラマー思考編
 
+## 公開構成(musica ハブ)
+
+`musica.gdt-lab.com` を音楽ラボのハブとし、楽器ごとにサブパスで公開する。
+
+- `musica.gdt-lab.com/` — ロビー(楽器選択)
+- `musica.gdt-lab.com/drums/` — ドラム検定(本アプリ)
+- 将来:`/guitar/` `/bass/` … をフォルダ追加で増設
+
+GitHub Pages の独自ドメイン設定はリポジトリ直下の `CNAME`(`musica.gdt-lab.com`)で行う。
+
 ## 動かし方
 
-`index.html` をブラウザで直接開く(ビルド不要の静的サイト)。GitHub Pages で公開可能。
+ローカルでは静的サーバーを立てて開く(相対パスのため直開きより確実):
+
+```
+python3 -m http.server 8000
+# → http://localhost:8000/        (ロビー)
+# → http://localhost:8000/drums/  (ドラム検定)
+```
 
 ## ファイル構成
 
-- `index.html` — エントリーポイント(全カテゴリのデータを読み込む)
-- `styles.css` — スタイル
-- `app.js` — 画面遷移・採点・バッジ判定・選択肢シャッフルロジック(全カテゴリ対応エンジン)
-- `data/categories.js` — 全13カテゴリのメタデータ
-- `data/catNN_*.js` — 各カテゴリの100問・小枠(subset)定義(NN = 01〜13)
-- `data/catNN_references.js` — 各カテゴリの参照(図解)テーブル
-- `data/_GENERATION_SPEC.md` — 問題生成仕様(選択肢パレット・難易度構成・検証手順)
+- `CNAME` — 独自ドメイン(`musica.gdt-lab.com`)
+- `index.html` — ロビー(楽器選択ハブ)
+- `drums/index.html` — ドラム検定エントリーポイント(全カテゴリのデータを読み込む)
+- `drums/styles.css` — スタイル
+- `drums/app.js` — 画面遷移・採点・バッジ判定・選択肢シャッフルロジック(全カテゴリ対応エンジン)
+- `drums/data/categories.js` — 全13カテゴリのメタデータ
+- `drums/data/catNN_*.js` — 各カテゴリの100問・小枠(subset)定義(NN = 01〜13)
+- `drums/data/catNN_references.js` — 各カテゴリの参照(図解)テーブル
+- `drums/data/_GENERATION_SPEC.md` — 問題生成仕様(選択肢パレット・難易度構成・検証手順)
 
 ## 採点ロジック
 
