@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>運営者情報・お問い合わせ — musica / GDT Lab</title>
+  <meta name="description" content="musica(GDT Lab)の運営者情報とお問い合わせ窓口。">
+  <style>
+    :root{--bg:#08080a;--fg:#f4f2ec;--muted:#8a8780;--gold:#c9a24a;--line:rgba(255,255,255,0.08);--card:rgba(255,255,255,0.02);}
+    *{box-sizing:border-box;margin:0;padding:0;}
+    html,body{background:var(--bg);color:var(--fg);}
+    body{font-family:"Hiragino Mincho ProN","Yu Mincho","YuMincho","Georgia",serif;-webkit-font-smoothing:antialiased;line-height:1.9;}
+    .wrap{max-width:760px;margin:0 auto;padding:0 24px;}
+    header{padding:36px 0 8px;border-bottom:1px solid var(--line);}
+    .brand-eyebrow{font-size:11px;letter-spacing:.42em;color:var(--muted);text-transform:uppercase;}
+    .brand{font-size:26px;letter-spacing:.08em;margin-top:6px;font-weight:700;}
+    .brand .dot{color:var(--gold);}
+    .back{display:inline-block;margin-top:14px;color:var(--muted);text-decoration:none;font-size:13px;}
+    .back:hover{color:var(--fg);}
+    main{padding:34px 0 40px;}
+    h1{font-size:30px;letter-spacing:.04em;margin-bottom:24px;}
+    h2{font-size:18px;letter-spacing:.03em;margin:32px 0 10px;color:var(--gold);}
+    p{margin:10px 0;font-size:15px;color:rgba(244,242,236,.9);}
+    a{color:var(--gold);}
+    table{width:100%;border-collapse:collapse;margin:14px 0;font-size:15px;}
+    th,td{text-align:left;padding:12px 10px;border-bottom:1px solid var(--line);vertical-align:top;}
+    th{color:var(--muted);font-weight:400;white-space:nowrap;width:34%;}
+    .card{border:1px solid var(--line);background:var(--card);border-radius:12px;padding:20px 22px;margin:16px 0;}
+    footer{border-top:1px solid var(--line);padding:22px 0 30px;color:var(--muted);font-size:12px;display:flex;gap:18px;flex-wrap:wrap;}
+    footer a{color:var(--muted);text-decoration:none;}
+    footer a:hover{color:var(--fg);}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand-eyebrow">Gravity Dynamics Theory · Lab</div>
+      <div class="brand">musica<span class="dot">.</span></div>
+      <a class="back" href="/">← トップへ戻る</a>
+    </header>
+
+    <main>
+      <h1>運営者情報・お問い合わせ</h1>
+
+      <h2>当サイトについて</h2>
+      <p>「musica」は、楽器演奏の背景にある知識・判断・表現を問う知識検定を公開するラボです。単なる用語の暗記ではなく、「なぜそうするのか」を理解することを大切にしています。ドラムをはじめ、今後さまざまな楽器の検定を追加していきます。</p>
+
+      <h2>運営者情報</h2>
+      <div class="card">
+        <table>
+          <tr><th>運営者</th><td>GDT Lab</td></tr>
+          <tr><th>サイト名</th><td>musica(<a href="https://musica.gdt-lab.com/">musica.gdt-lab.com</a>)</td></tr>
+          <tr><th>お問い合わせ</th><td><a href="mailto:contact@gdt-lab.com">contact@gdt-lab.com</a></td></tr>
+        </table>
+      </div>
+
+      <h2>お問い合わせ</h2>
+      <p>ご意見・ご質問・不具合のご報告などは、下記メールアドレスまでお気軽にご連絡ください。内容を確認のうえ、順次対応いたします(個別の返信をお約束するものではありません)。</p>
+      <p>宛先:<a href="mailto:contact@gdt-lab.com">contact@gdt-lab.com</a></p>
+
+      <h2>プライバシーポリシー</h2>
+      <p>当サイトにおける Cookie・広告配信・データの取り扱いについては、<a href="/privacy/">プライバシーポリシー</a>をご確認ください。</p>
+    </main>
+
+    <footer>
+      <a href="/">トップ</a>
+      <a href="/about/">運営者情報</a>
+      <a href="/privacy/">プライバシーポリシー</a>
+      <span>© <span id="year"></span> GDT Lab</span>
+    </footer>
+  </div>
+  <script>document.getElementById("year").textContent=new Date().getFullYear();</script>
+</body>
+</html>
